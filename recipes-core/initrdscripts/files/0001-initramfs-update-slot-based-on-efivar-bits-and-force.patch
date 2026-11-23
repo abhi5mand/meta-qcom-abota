@@ -19,17 +19,17 @@ index df0cbfb091..252ae494ff 100644
  				if [ -n "$bootparam_rootfstype" ]; then
  					flags="$flags -t$bootparam_rootfstype"
  				fi
-+
++               
 +				third_hex=$(
 +				efivar -n 8be4df61-93ca-11d2-aa0d-00e098032b8c-OsTrialBootStatus |
 +				awk '/^Value:/ {val=1; next} val {for(i=1;i<=NF;i++){if($i~/^[0-9A-Fa-f]{2}$/){c++; if(c==3){print $i; exit}}}}'
 +				)
-+
-+				b2=$((16#$third_hex))
-+
-+				b18val=$(( (b2 >> 2) & 1 ))
-+
-+				if [ "$b18val" -eq 1 ] && [ "$bootparam_root" = "/dev/disk/by-partlabel/system" ]; then
++               b2=0
++				if [ -n "$third_hex" ]; then
++               	b2=$((16#$third_hex))
++				fi
++               b18val=$(( (b2 >> 2) & 1 ))
++				if [ "$b18val" -eq 1 ] && [ "${bootparam_root%_b}" = "$bootparam_root" ]; then
 +				bootparam_root="${bootparam_root}_b"
 +				export bootparam_root
 +				fi
